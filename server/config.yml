@@ -1,0 +1,15 @@
+server:
+  port: 8090
+
+datasource:
+  driver: postgres  #必填，仅支持pgsql、mysql、sqlite3
+  #以下为可选参数
+  #若设置了url，优先启用url
+  #若不设置url, 其它参数必填
+#  url: host=127.0.0.1 user=postgres dbname=test_db sslmode=disable password=123456
+  user: postgres
+  password: 123456
+  host: 127.0.0.1   #可选
+  database: test_db
+  port: 5432    #可选
+
