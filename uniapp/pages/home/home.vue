@@ -41,10 +41,20 @@
 			<text class="iconfont icon-search" @click="goSearch"></text>
 			<!-- 登录弹出层 -->
 			<u-popup v-model="isLogIn" width="80%">
-				<view v-if="!user.username">
-					<view class="loginText">手机电脑多端同步，尽享海量高品质音乐</view>
-					<view class="loginBtn">
-						<navigator url="/pages/index/index">立即登录</navigator>
+				<view class="liebiao-top">
+					<view v-if="!user.username" class="noLogin">
+						<view class="loginText">手机电脑多端同步，尽享海量高品质音乐</view>
+						<view class="loginBtn">
+							<navigator url="/pages/launch/launch">立即登录</navigator>
+						</view>
+					</view>
+					<view v-else>
+						<view class="user-info">
+							<view class="user-ico">
+								<image src="../../static/img/QQpic2.jpg" mode=""></image>
+							</view>
+							<view class="user-username">{{user.username}}</view>
+						</view>
 					</view>
 				</view>
 				<view class="loginItem">
@@ -67,8 +77,14 @@
 				</view>
 				<view class="loginList">
 					<view v-for="(item,index) in loginItems" :key='index' class="loginList-item">
-						<text :class="'iconfont '+item.icon"></text>
-						<text style="margin-left: 18rpx;">{{item.name}}</text>
+						<view v-if="index===loginItems.length - 1" @click="exit">
+							<text :class="'iconfont '+item.icon"></text>
+							<text style="margin-left: 18rpx;">{{item.name}}</text>
+						</view>
+						<view v-else>
+							<text :class="'iconfont '+item.icon"></text>
+							<text style="margin-left: 18rpx;">{{item.name}}</text>
+						</view>
 					</view>
 				</view>
 			</u-popup>
@@ -222,7 +238,7 @@ export default {
 					icon:'icon-site'
 				},
 				{
-					name:'退出',
+					name:'退出登录',
 					icon:'icon-tuichu2'
 				}
 			],
@@ -274,19 +290,28 @@ export default {
 	methods: {
 		...mapMutations(['getIndex', 'getPlayList', 'getIsBtn']),
 		
+		// 获取发现页面数据
+		getFindData() {
+			const token = uni.getStorageSync('token');
+			if (token) {
+				this.getUserInfo()
+				// this.getBanner();
+				// this.getSongList();
+				// this.getNewSong();
+			}
+		},
+		exit(){
+			uni.removeStorageSync('token')
+			uni.reLaunch({
+				url: '/pages/launch/launch'
+			});
+		},
 		// 获取用户信息
 		async getUserInfo(){
 			const res = await this.$u.get('/auth/info');
 			if (res.code === 200) {
 				this.user = res.data.user
 			}
-		},
-		// 获取发现页面数据
-		getFindData() {
-			this.getUserInfo()
-			// this.getBanner();
-			// this.getSongList();
-			// this.getNewSong();
 		},
 		// 获取banner
 		async getBanner() {
@@ -476,21 +501,71 @@ $bColor: #EC4141;
 		font-size: 44rpx;
 		z-index: 99;
 	}
-	.loginText{
-		margin: 40rpx 0 25rpx 0;
-		font-size: 24rpx;
-		text-align: center;
+	.liebiao-top {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin: 50upx 0;
+		
+		.user-info {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			
+			.user-icon {
+				font-size: 36px;
+				color: #666;
+			}
+		}
+		
+		.user-ico {
+			margin-left: 45upx;
+			width: 100upx;
+			height: 100upx;
+			border-radius: 50%;
+			background-color: #c0c0c0;
+			text-align: center;
+			line-height: 110upx;
+			
+			image{
+				width: 100%;
+				height: 100%;
+				border-radius: 50%;
+			}
+		}
+		
+		.user-msg {
+			margin-left: 25upx;
+			font-size: 12px;
+		}
+		
+		.user-username {
+			margin-left: 25upx;
+			font-size: 16px;
+		}
+		
+		.noLogin{
+			width: 100%;
+			.loginText{
+				margin: 40rpx 0 25rpx 0;
+				font-size: 24rpx;
+				text-align: center;
+			}
+			.loginBtn{
+				margin: 0 auto;
+				width: 200rpx;
+				height: 52rpx;
+				color: #fff;
+				text-align: center;
+				line-height: 50rpx;
+				background-color: $bColor;
+				border-radius: 20px;
+			}
+		}
+		
 	}
-	.loginBtn{
-		margin: 0 auto;
-		width: 200rpx;
-		height: 52rpx;
-		color: #fff;
-		text-align: center;
-		line-height: 50rpx;
-		background-color: $bColor;
-		border-radius: 20px;
-	}
+	
 	.loginItem{
 		margin: 40rpx 0;
 		display: flex;

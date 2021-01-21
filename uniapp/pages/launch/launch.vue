@@ -13,7 +13,7 @@
 		<!-- button登陆按钮 -->
 		<view class="button">
 			<view class="buttonchild-first">
-				<navigator url="/pages/home/home"><button type="default" plain>立即体验</button></navigator>
+				<button type="default" plain @click="getExperienceCode">立即体验</button>
 			</view>
 			<view class="buttonchild">
 				<navigator url="/pages/login/login"><button type="default" plain>登录</button></navigator>
@@ -39,7 +39,17 @@
 			});
 		},
 		methods: {
-
+			rand(min,max){
+				return Math.floor(Math.random()*(max-min))+min
+			},
+			//获得体验码
+			getExperienceCode(){
+				var randnum = this.rand(1000,9999)
+				uni.setStorageSync('experience_code',randnum)
+				uni.reLaunch({
+					url: '/pages/home/home'
+				});
+			}
 		}
 	}
 </script>
@@ -80,25 +90,20 @@
 			height: 30%;
 
 			.buttonchild-first {
-				width: 50%;
 				position: absolute;
 				left: 25%;
-
-				// top:25%;
-				navigator {
-					width: 100%;
-					height: 70rpx;
-					border-radius: 50px;
-					margin-bottom: 30rpx;
-
-					button {
-						background-color: #FFFFFF;
-						color: #EC4141;
-						line-height: 70rpx;
-						font-size: 28rpx;
-						border-radius: 50rpx;
-						border: 1rpx solid #DADCE0;
-					}
+				width: 50%;
+				height: 70rpx;
+				border-radius: 50px;
+				margin-bottom: 30rpx;
+				
+				button {
+					background-color: #FFFFFF;
+					color: #EC4141;
+					line-height: 70rpx;
+					font-size: 28rpx;
+					border-radius: 50rpx;
+					border: 1rpx solid #DADCE0;
 				}
 			}
 

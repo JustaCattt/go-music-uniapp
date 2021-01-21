@@ -34,17 +34,27 @@ const install = (Vue, vm) => {
 		// if(config.url == '/user/login') config.header.noToken = true;
 		// 最后需要将config进行return
 		
+		
 		//	自定义拦截
+		const experience_code = uni.getStorageSync('experience_code');
 		const token = uni.getStorageSync('token');
 		if (token) {
 			config.header = {
 				'Authorization': 'Bearer ' + token
 			};
 		} else {
-			uni.navigateTo({
-				url: '../../pages/index/index'
-			});
-			return;
+			if (experience_code) {
+				uni.navigateTo({
+					url: '../../pages/home/home'
+				});
+				uni.removeStorageSync('experience_code')
+				return;
+			} else {
+				uni.navigateTo({
+					url: '../../pages/launch/launch'
+				});
+				return;
+			}
 		}
 		
 		return config;

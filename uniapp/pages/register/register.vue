@@ -11,7 +11,7 @@
 
 <script>
 	// 引入md5js插件
-	import md5 from '../../static/js/md5.js'
+	import md5 from '../../common/md5.js'
 	export default {
 		data() {
 			return {

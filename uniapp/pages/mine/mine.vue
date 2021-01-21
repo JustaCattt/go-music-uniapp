@@ -5,7 +5,7 @@
 			<view v-if="!user.username">
 				<view class="user-info">
 					<view class="user-ico">
-						<navigator url="/pages/index/index">
+						<navigator url="/pages/launch/launch">
 							<text class="user-icon text-black iconfont icon-yonghu" />
 						</navigator>
 					</view>
@@ -72,7 +72,6 @@
 </template>
 
 <script>
-	import request from "../../static/js/request.js"
 	export default {
 		name: 'Mine',
 		props: {

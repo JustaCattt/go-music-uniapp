@@ -1,9 +1,19 @@
 {
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
-			"path": "pages/index/index",
+		    "path" : "pages/home/home",
+		    "style" :                                                                                    
+		    {
+				"navigationStyle":"custom",
+		        "navigationBarTitleText": "发现",
+		        "enablePullDownRefresh": false
+		    }
+		    
+		},
+		{
+			"path": "pages/launch/launch",
 			"style": {
-				"navigationBarTitleText": "Music-App",
+				"navigationBarTitleText": "启动页",
 				"navigationStyle":"custom"
 			}
 		}
@@ -21,17 +31,6 @@
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "",
-                "enablePullDownRefresh": false
-            }
-            
-        }
-        
-        ,{
-            "path" : "pages/home/home",
-            "style" :                                                                                    
-            {
-				"navigationStyle":"custom",
-                "navigationBarTitleText": "主页",
                 "enablePullDownRefresh": false
             }
             
