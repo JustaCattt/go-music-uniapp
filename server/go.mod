@@ -1,4 +1,4 @@
-module Music/server
+module go-music-uniapp/server
 
 go 1.15
 

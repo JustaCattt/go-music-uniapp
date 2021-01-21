@@ -1,11 +1,11 @@
 package db
 
 import (
-	"Music/server/model"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/spf13/viper"
+	"go-music-uniapp/server/model"
 	"time"
 )
 
@@ -33,7 +33,7 @@ func InitPgDB() *gorm.DB {
 func NewConnection(dbConfig DbConfig) *gorm.DB {
 	conn, err := gorm.Open(dbConfig.Driver, dbConfig.URL)
 	if err != nil {
-		panic("failed to connect database:\t"+err.Error())
+		panic("failed to connect database:\t" + err.Error())
 	}
 	return conn
 }
@@ -44,7 +44,7 @@ func ConfigParser() (dbConfig DbConfig) {
 	url := viper.GetString("datasource.url")
 	if url != "" {
 		dbConfig.URL = url
-	}else {
+	} else {
 		user := viper.GetString("datasource.user")
 		password := viper.GetString("datasource.password")
 		host := viper.GetString("datasource.host")

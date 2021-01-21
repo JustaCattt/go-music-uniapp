@@ -1,9 +1,9 @@
 package router
 
 import (
-	"Music/server/controller"
-	"Music/server/middleware"
 	"github.com/gin-gonic/gin"
+	"go-music-uniapp/server/controller"
+	"go-music-uniapp/server/middleware"
 )
 
 func UseRoutes(r *gin.Engine) *gin.Engine {

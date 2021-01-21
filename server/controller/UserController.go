@@ -1,16 +1,16 @@
 package controller
 
 import (
-	"Music/server/db"
-	"Music/server/model"
-	"Music/server/response"
-	"Music/server/util"
 	"github.com/gin-gonic/gin"
+	"go-music-uniapp/server/db"
+	"go-music-uniapp/server/model"
+	"go-music-uniapp/server/response"
+	"go-music-uniapp/server/util"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 )
 
-func Register(ctx *gin.Context)  {
+func Register(ctx *gin.Context) {
 	//	获取参数
 	username := ctx.PostForm("username")
 	telephone := ctx.PostForm("telephone")
@@ -42,21 +42,21 @@ func Register(ctx *gin.Context)  {
 	//	创建用户
 	hasedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		response.ServerError(ctx,"加密错误")
+		response.ServerError(ctx, "加密错误")
 		return
 	}
 	newUser := model.User{
-		Username: username,
+		Username:  username,
 		Telephone: telephone,
-		Password: string(hasedPassword),
+		Password:  string(hasedPassword),
 	}
 	db.PGEngine.Create(&newUser)
 
 	//	返回结果
-	response.Success(ctx,nil,"注册成功")
+	response.Success(ctx, nil, "注册成功")
 }
 
-func Login(ctx *gin.Context)  {
+func Login(ctx *gin.Context) {
 	//	获取参数
 	telephone := ctx.PostForm("telephone")
 	password := ctx.PostForm("password")
@@ -88,16 +88,16 @@ func Login(ctx *gin.Context)  {
 	//	发放token
 	token, err := util.ReleaseToken(user)
 	if err != nil {
-		response.ServerError(ctx,"系统异常")
+		response.ServerError(ctx, "系统异常")
 		log.Printf("token generate error : %v\n", err)
 		return
 	}
 
 	//	返回结果
-	response.Success(ctx,gin.H{"token": token},"登录成功")
+	response.Success(ctx, gin.H{"token": token}, "登录成功")
 }
 
-func Info(ctx *gin.Context)  {
+func Info(ctx *gin.Context) {
 	user, _ := ctx.Get("user")
 
 	//	返回结果

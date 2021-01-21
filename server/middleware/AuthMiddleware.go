@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"Music/server/db"
-	"Music/server/model"
-	"Music/server/util"
 	"github.com/gin-gonic/gin"
+	"go-music-uniapp/server/db"
+	"go-music-uniapp/server/model"
+	"go-music-uniapp/server/util"
 	"net/http"
 	"strings"
 )
@@ -16,7 +16,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		tokenString := ctx.GetHeader("Authorization")
 
 		//	validate token format
-		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer "){
+		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "权限不足"})
 			ctx.Abort()
 			return
@@ -24,7 +24,7 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		tokenString = tokenString[7:]
 
-		token, claims ,err := util.ParseToken(tokenString)
+		token, claims, err := util.ParseToken(tokenString)
 		if err != nil || !token.Valid {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"code": 401, "msg": "权限不足：无效token"})
 			ctx.Abort()

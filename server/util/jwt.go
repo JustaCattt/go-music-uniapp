@@ -1,8 +1,8 @@
 package util
 
 import (
-	"Music/server/model"
 	"github.com/dgrijalva/jwt-go"
+	"go-music-uniapp/server/model"
 	"time"
 )
 
@@ -19,9 +19,9 @@ func ReleaseToken(user model.User) (string, error) {
 		UserId: user.ID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
-			IssuedAt: time.Now().Unix(),
-			Issuer: "JUSTACAT CHEN",
-			Subject: "user token",
+			IssuedAt:  time.Now().Unix(),
+			Issuer:    "JUSTACAT CHEN",
+			Subject:   "user token",
 		},
 	}
 

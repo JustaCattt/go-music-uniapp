@@ -1,9 +1,9 @@
 package router
 
 import (
-	"Music/server/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"go-music-uniapp/server/middleware"
 )
 
 func InitRouter() {
@@ -12,7 +12,7 @@ func InitRouter() {
 	r = UseRoutes(r)                       //使用路由组
 	port := viper.GetString("server.port") //获取配置信息
 	if port != "" {
-		panic(r.Run(":"+port))
+		panic(r.Run(":" + port))
 	}
 	panic(r.Run())
 }
