@@ -14,6 +14,11 @@ type DbConfig struct {
 }
 
 var PGEngine *gorm.DB
+var models = []interface{}{
+	&model.User{},
+	&model.Artist{},
+	&model.Song{},
+}
 
 //初始化postgres数据库
 func InitPgDB() *gorm.DB {
@@ -22,9 +27,9 @@ func InitPgDB() *gorm.DB {
 	db.DB().SetMaxIdleConns(10)                   //最大空闲连接数
 	db.DB().SetMaxOpenConns(30)                   //最大连接数
 	db.DB().SetConnMaxLifetime(time.Second * 300) //设置连接空闲超时
-	db.SingularTable(true)                        //如果使用gorm来帮忙创建表时，这里填写false的话gorm会给表添加s后缀，填写true则不会
+	db.SingularTable(false)                       //如果使用gorm来帮忙创建表时，这里填写false的话gorm会给表添加s后缀，填写true则不会
 	db.LogMode(true)                              //打印sql语句
-	db.AutoMigrate(&model.User{})                 //自动迁移建表，实时更新表
+	db.AutoMigrate(models...)                     //自动迁移建表，实时更新表
 	PGEngine = db                                 //赋值给PGEngine，供外部使用
 	return db
 }

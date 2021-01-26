@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/spf13/viper"
+	"go-music-uniapp/server/dataGetter"
 	"go-music-uniapp/server/db"
 	"go-music-uniapp/server/router"
 	"log"
@@ -18,6 +19,7 @@ func main() {
 			log.Println("An error occurred while database was closing the connection : ", err)
 		}
 	}()
+	dataGetter.InitData()
 	router.InitRouter()
 }
 

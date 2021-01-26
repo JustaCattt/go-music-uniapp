@@ -10,6 +10,6 @@ datasource:
   user: postgres
   password: 123456
   host: 127.0.0.1   #可选
-  database: test_db
+  database: music_db
   port: 5432    #可选
 
