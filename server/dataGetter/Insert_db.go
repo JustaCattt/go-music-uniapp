@@ -9,7 +9,6 @@ var ch = make(chan model.Artist)
 
 func InsertArtists() {
 	artists := GetArtists()
-	//通过查询第一条记录来判断表中数据是否为空，
 	for _, artist := range artists {
 		ch <- artist
 		db.PGEngine.Create(&artist)
@@ -28,8 +27,8 @@ func InsertSongs() {
 }
 
 func MapArtistToSongs() map[string][]model.Song {
-	m := make(map[string][]model.Song, 0)
 	artists := GetArtists()
+	m := make(map[string][]model.Song, len(artists))
 	for _, artist := range artists {
 		songs := GetAllSongsByArtistId(artist.Id)
 		m[artist.Name] = songs

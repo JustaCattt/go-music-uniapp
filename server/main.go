@@ -19,7 +19,12 @@ func main() {
 			log.Println("An error occurred while database was closing the connection : ", err)
 		}
 	}()
-	dataGetter.InitData()
+	if viper.GetBool("first_start") {
+		fmt.Println("开始获取数据...")
+		//dataGetter.CreateUsers(20, "19968086600", "123456")		//创建20个用户
+		dataGetter.InitData() //获取歌曲数据
+		fmt.Println("获取数据完毕")
+	}
 	router.InitRouter()
 }
 

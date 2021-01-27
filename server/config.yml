@@ -13,3 +13,5 @@ datasource:
   database: music_db
   port: 5432    #可选
 
+first_start: false  #首次启动就填true，会初始化数据（包括假数据）
+

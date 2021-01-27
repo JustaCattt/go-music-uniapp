@@ -18,6 +18,7 @@ var models = []interface{}{
 	&model.User{},
 	&model.Artist{},
 	&model.Song{},
+	&model.FavorList{},
 }
 
 //初始化postgres数据库
