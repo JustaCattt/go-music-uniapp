@@ -41,7 +41,7 @@ func TestCreateFavorList(t *testing.T) {
 			log.Println("An error occurred while database was closing the connection : ", err)
 		}
 	}()
-	CreateFavorList()
+	CreateFavorList(20)
 }
 
 func initViper() {

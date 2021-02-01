@@ -18,6 +18,9 @@ func UseRoutes(r *gin.Engine) *gin.Engine {
 		auth.GET("/info", middleware.AuthMiddleware(), controller.Info)
 	}
 
+	//推荐歌单路由
+	r.GET("/recommends", middleware.AuthMiddleware(), controller.Recommender)
+
 	//返回路由集
 	return r
 }

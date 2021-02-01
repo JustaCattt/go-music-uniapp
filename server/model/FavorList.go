@@ -1,7 +1,7 @@
 package model
 
 type FavorList struct {
-	UserId    int
+	UserId    uint
 	SongName  string
 	SongId    int
 	PlayCount int

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/spf13/viper"
+	"go-music-uniapp/server/data"
 	"go-music-uniapp/server/dataGetter"
 	"go-music-uniapp/server/db"
 	"go-music-uniapp/server/router"
@@ -21,11 +22,14 @@ func main() {
 	}()
 	if viper.GetBool("first_start") {
 		fmt.Println("开始获取数据...")
-		//dataGetter.CreateUsers(20, "19968086600", "123456")		//创建20个用户
-		dataGetter.InitData() //获取歌曲数据
+		dataGetter.CreateUsers(20, "19968086600", "123456") //创建20个用户
+		dataGetter.InitData()                               //获取歌曲数据
+		dataGetter.CreateFavorList(20)                      //为每个用户随机生成收藏歌单
+		data.DbToCsv()
 		fmt.Println("获取数据完毕")
+	} else {
+		router.InitRouter()
 	}
-	router.InitRouter()
 }
 
 func initViper() {
