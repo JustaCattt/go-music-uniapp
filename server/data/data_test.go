@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"go-music-uniapp/server/db"
+	"go-music-uniapp/server/util"
 	"log"
 	"testing"
 )
@@ -17,7 +18,22 @@ func TestDb_to_csv(t *testing.T) {
 			log.Println("An error occurred while database was closing the connection : ", err)
 		}
 	}()
-	DbToCsv()
+	DbToCsv2()
+}
+
+func DbToCsv2() {
+	var results []Result
+	db.PGEngine.Table("favor_lists").Find(&results)
+	var data [][]string
+	for index, _ := range results {
+		fmt.Println(results[index])
+		result := results[index]
+		uIdStr := fmt.Sprintf("%d", result.UserId)
+		sIdStr := fmt.Sprintf("%d", result.SongId)
+		pcStr := fmt.Sprintf("%d", result.PlayCount)
+		data = append(data, []string{uIdStr, sIdStr, pcStr})
+	}
+	util.CsvWriter("./data.csv", data)
 }
 
 func initViper() {
