@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-music-uniapp/server/db"
 	"go-music-uniapp/server/util"
+	"os"
 )
 
 type Result struct {
@@ -24,5 +25,7 @@ func DbToCsv() {
 		pcStr := fmt.Sprintf("%d", result.PlayCount)
 		data = append(data, []string{uIdStr, sIdStr, pcStr})
 	}
-	util.CsvWriter("./data.csv", data)
+	workDir, _ := os.Getwd() //获取工作目录
+	dir := fmt.Sprintf("%s/data/data.csv", workDir)
+	util.CsvWriter(dir, data)
 }

@@ -9,6 +9,7 @@ import (
 	"go-music-uniapp/server/router"
 	"log"
 	"os"
+	"time"
 )
 
 func main() {
@@ -22,10 +23,15 @@ func main() {
 	}()
 	if viper.GetBool("first_start") {
 		fmt.Println("开始获取数据...")
-		dataGetter.CreateUsers(20, "19968086600", "123456") //创建20个用户
-		dataGetter.InitData()                               //获取歌曲数据
-		dataGetter.CreateFavorList(20)                      //为每个用户随机生成收藏歌单
+
+		dataGetter.InitData()                               //获取歌曲数据，用时不确定，快的话一分钟足以，因为启用了goroutine
+		time.Sleep(3 * time.Minute)							//这里阻塞是为了保证后面的表有数据依赖，前三分钟获取歌单，后7分钟制造假数据并生成csv
+
+		dataGetter.CreateUsers(20, "19968086600", "123456") //创建20个用户，20s
+		dataGetter.CreateFavorList(20)                      //为每个用户随机生成收藏歌单,20*20s=400s，加起来总共7分钟
+
 		data.DbToCsv()
+
 		fmt.Println("获取数据完毕")
 	} else {
 		router.InitRouter()

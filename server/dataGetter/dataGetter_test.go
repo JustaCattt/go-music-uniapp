@@ -32,7 +32,7 @@ func TestCreateUsers(t *testing.T) {
 	CreateUsers(20, "19968086600", "123456") //创建20个用户
 }
 
-func TestCreateFavorList(t *testing.T) {
+func Test(t *testing.T) {
 	initViper()
 	pg := db.InitPgDB()
 	defer func() {
@@ -41,7 +41,7 @@ func TestCreateFavorList(t *testing.T) {
 			log.Println("An error occurred while database was closing the connection : ", err)
 		}
 	}()
-	CreateFavorList(20)
+	InitData()
 }
 
 func initViper() {
