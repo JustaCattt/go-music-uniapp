@@ -10,11 +10,17 @@ import (
 	"strconv"
 )
 
+//结果结构体
 type Result struct {
 	SongId     int
 	SongName   string
 	ArtistName string
 	PlayUrl    string
+}
+
+//拼接播放地址
+func getPlayUrl(id int) string {
+	return fmt.Sprintf("http://music.163.com/song/media/outer/url?id=%d", id)
 }
 
 //推荐歌曲列表
@@ -36,7 +42,7 @@ func Recommender(ctx *gin.Context) {
 		artist := new(model.Artist)
 		db.PGEngine.Table("songs").Where("id = ?", r.ItemId).First(&song)
 		db.PGEngine.Table("artists").Where("id = ?", song.ArtistId).First(&artist)
-		playUrl := fmt.Sprintf("http://music.163.com/song/media/outer/url?id=%d", song.Id)
+		playUrl := getPlayUrl(song.Id)
 		result := Result{
 			SongId:     song.Id,
 			SongName:   song.Name,
@@ -100,7 +106,7 @@ func Play(ctx *gin.Context) {
 	db.PGEngine.Table("songs").Where("id = ?", songId).First(&song)
 	var artist model.Artist
 	db.PGEngine.Table("artists").Where("id = ?", song.ArtistId).First(&artist)
-	playUrl := fmt.Sprintf("http://music.163.com/song/media/outer/url?id=%d", songId)
+	playUrl := getPlayUrl(song.Id)
 	result := Result{
 		SongId:     songId,
 		SongName:   song.Name,
@@ -202,7 +208,7 @@ func GetFavorList(ctx *gin.Context) {
 		db.PGEngine.Table("songs").Where("id = ?", fl[key].SongId).First(&song)
 		artist := new(model.Artist)
 		db.PGEngine.Table("artists").Where("id = ?", song.ArtistId).First(&artist)
-		playUrl := fmt.Sprintf("http://music.163.com/song/media/outer/url?id=%d", song.Id)
+		playUrl := getPlayUrl(song.Id)
 		result := Result{
 			SongId:     song.Id,
 			SongName:   song.Name,
@@ -231,7 +237,7 @@ func GetRecentList(ctx *gin.Context) {
 		db.PGEngine.Table("songs").Where("id = ?", fl[key].SongId).First(&song)
 		artist := new(model.Artist)
 		db.PGEngine.Table("artists").Where("id = ?", song.ArtistId).First(&artist)
-		playUrl := fmt.Sprintf("http://music.163.com/song/media/outer/url?id=%d", song.Id)
+		playUrl := getPlayUrl(song.Id)
 		result := Result{
 			SongId:     song.Id,
 			SongName:   song.Name,
