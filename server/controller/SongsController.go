@@ -68,7 +68,10 @@ func Play(ctx *gin.Context) {
 
 	//查询最近列表中是否存在
 	var rp model.RecentList
-	db_result := db.PGEngine.Table("recent_lists").Where("song_id = ?", songId).First(&rp)
+	db_result := db.PGEngine.Table("recent_lists").Where(&model.RecentList{
+		UserId: u.ID,
+		SongId: songId,
+	}).First(&rp)
 
 	//若找不到
 	if db_result.RecordNotFound() {
@@ -120,13 +123,19 @@ func Favor(ctx *gin.Context) {
 	songId, _ := strconv.Atoi(id)
 
 	var fl model.FavorList
-	db_result1 := db.PGEngine.Table("favor_lists").Where(&model.FavorList{UserId: u.ID, SongId: songId}).First(&fl)
+	db_result1 := db.PGEngine.Table("favor_lists").Where(&model.FavorList{
+		UserId: u.ID,
+		SongId: songId,
+	}).First(&fl)
 
 	//如果没有被收藏
 	if db_result1.RecordNotFound() {
 		//查询最近列表中是否存在
 		var rp model.RecentList
-		db_result := db.PGEngine.Table("recent_lists").Where("song_id = ?", songId).First(&rp)
+		db_result := db.PGEngine.Table("recent_lists").Where(&model.RecentList{
+			UserId: u.ID,
+			SongId: songId,
+		}).First(&rp)
 
 		//若找不到
 		if db_result.RecordNotFound() {
@@ -166,7 +175,10 @@ func Favor(ctx *gin.Context) {
 			response.Success(ctx, nil, "收藏成功")
 		}
 	} else { //如果收藏了
-		db.PGEngine.Table("favor_lists").Where("song_id = ?", songId).Delete(&fl)
+		db.PGEngine.Table("favor_lists").Where(&model.FavorList{
+			UserId: u.ID,
+			SongId: songId,
+		}).Delete(&fl)
 
 		//返回结果
 		response.Success(ctx, nil, "取消收藏成功")
