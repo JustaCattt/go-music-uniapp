@@ -18,12 +18,19 @@ func UseRoutes(r *gin.Engine) *gin.Engine {
 		auth.GET("/info", middleware.AuthMiddleware(), controller.Info)
 	}
 
-	//推荐歌单路由
+	//歌曲控制路由
 	song := r.Group("/song")
 	{
-		song.GET("/recommends", middleware.AuthMiddleware(), controller.Recommender)
 		song.GET("/play/:id", middleware.AuthMiddleware(), controller.Play)
 		song.GET("/favor/:id", middleware.AuthMiddleware(), controller.Favor)
+	}
+
+	//获取列表
+	list := r.Group("/list")
+	{
+		list.GET("/recommend/:number", middleware.AuthMiddleware(), controller.Recommender)
+		list.GET("/favor", middleware.AuthMiddleware(), controller.GetFavorList)
+		list.GET("/recent", middleware.AuthMiddleware(), controller.GetRecentList)
 	}
 
 	//返回路由集

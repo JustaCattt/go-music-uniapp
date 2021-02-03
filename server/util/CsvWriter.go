@@ -2,6 +2,7 @@ package util
 
 import (
 	"encoding/csv"
+	"log"
 	"os"
 )
 
@@ -15,4 +16,12 @@ func CsvWriter(filename string, data [][]string) {
 	w := csv.NewWriter(file)
 	w.WriteAll(data)
 	w.Flush() // 写文件需要flush，不然缓存满了，后面的就写不进去了，只会写一部分
+}
+
+func RemoveCsvData(filepath string) {
+	//删除文件
+	err := os.Remove(filepath)
+	if err != nil {
+		log.Println(err)
+	}
 }

@@ -1,11 +1,9 @@
 package dataGetter
 
 import (
-	"encoding/json"
 	"fmt"
 	"go-music-uniapp/server/model"
-	"io/ioutil"
-	"net/http"
+	"go-music-uniapp/server/myhttp"
 )
 
 //网易云开源接口：http://musicapi.leanapp.cn/
@@ -23,30 +21,20 @@ type SongSlice struct {
 func GetArtists() []model.Artist {
 	url := fmt.Sprintf("%s/artist/list", API)
 	var s ArtistSlice
-	HttpGetParser(url, &s)
+	myhttp.HttpGetParser(url, &s)
 	return s.Artists
 }
 
 func GetAllSongsByArtistId(artistId int) []model.Song {
 	url := fmt.Sprintf("%s/artist/songs?id=%d", API, artistId)
 	var s SongSlice
-	HttpGetParser(url, &s)
+	myhttp.HttpGetParser(url, &s)
 	return s.Songs
 }
 
 func GetTop50SongsByArtistId(artistId int) []model.Song {
 	url := fmt.Sprintf("%s/artist/top/song?id=%d", API, artistId)
 	var s SongSlice
-	HttpGetParser(url, &s)
+	myhttp.HttpGetParser(url, &s)
 	return s.Songs
-}
-
-func HttpGetParser(url string, v interface{}) {
-	resp, err := http.Get(url)
-	defer resp.Body.Close()
-	if err != nil {
-		panic("http get error")
-	}
-	data, _ := ioutil.ReadAll(resp.Body)
-	json.Unmarshal(data, v)
 }

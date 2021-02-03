@@ -10,10 +10,10 @@
     
     3、在终端执行数feedback命令：
     
-        gorse import-feedback recommender/db/gorse.db data/data.csv --sep ","
+        gorse import-feedback mygorse/db/gorse.db data/data.csv --sep ","
     
     4、然后再执行推荐服务启动命令：
     
-        gorse serve -c recommender/config/knn.toml  默认给定knn、bpr模型的配置文件，这里以启动knn为例。
+        gorse serve -c mygorse/config/knn.toml  默认给定knn、bpr模型的配置文件，这里以启动knn为例。
     
     5、这时候可以启动server/main.go了。

@@ -3,41 +3,33 @@ package controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"go-music-uniapp/server/dataGetter"
 	"go-music-uniapp/server/db"
 	"go-music-uniapp/server/model"
+	"go-music-uniapp/server/mygorse"
 	"go-music-uniapp/server/response"
 	"strconv"
 )
 
-const RECOMMENDER_API = "http://127.0.0.1:8080"		//推荐服务
-const NUMBER = 10		//推荐数量
-
-type Recommend struct {
-	ItemId     string
-	Popularity int
-	Timestamp  string
-	Score      int
-}
-
 type Result struct {
-	SongId     int    `json:"id"`
-	SongName   string `json:"name"`
-	ArtistName string `json:"artist"`
-	PlayUrl    string `json:"url"`
+	SongId     int
+	SongName   string
+	ArtistName string
+	PlayUrl    string
 }
 
+//推荐歌曲列表
 func Recommender(ctx *gin.Context) {
+	number := ctx.Param("number")
+	num, _ := strconv.Atoi(number)
+
 	//获取userInfo
 	user, _ := ctx.Get("user")
 	u := user.(model.User)
 
-	//拼接推荐服务的请求url，并解析到rs中
-	url := fmt.Sprintf("%s/recommends/%d?number=%d", RECOMMENDER_API, u.ID, NUMBER)
-	var rs []Recommend
-	dataGetter.HttpGetParser(url, &rs)
-	var results []Result
+	//获取推荐歌单
+	rs := mygorse.GetRecommends(u.ID, num)
 
+	var results []Result
 	//遍历查询
 	for _, r := range rs {
 		song := new(model.Song)
@@ -60,11 +52,12 @@ func Recommender(ctx *gin.Context) {
 	}
 
 	//返回结果
-	response.Success(ctx, gin.H{"songs": results}, "")
+	msg := fmt.Sprintf("推荐歌曲%d首", num)
+	response.Success(ctx, gin.H{"list": results}, msg)
 }
 
 //播放，对应地址为http://localhost:8090/song/play/:id
-func Play(ctx *gin.Context)  {
+func Play(ctx *gin.Context) {
 	//获取userInfo
 	user, _ := ctx.Get("user")
 	u := user.(model.User)
@@ -74,23 +67,30 @@ func Play(ctx *gin.Context)  {
 	songId, _ := strconv.Atoi(id)
 
 	//查询最近列表中是否存在
-	var rp model.RecentlyPlayed
-	db_result := db.PGEngine.Table("recently_playeds").Where("song_id = ?", songId).First(&rp)
+	var rp model.RecentList
+	db_result := db.PGEngine.Table("recent_lists").Where("song_id = ?", songId).First(&rp)
 
 	//若找不到
 	if db_result.RecordNotFound() {
 		var song model.Song
 		db.PGEngine.Where("id = ?", songId).First(&song)
-		newRp := model.RecentlyPlayed{
+		newRp := model.RecentList{
 			UserId:    u.ID,
 			SongName:  song.Name,
 			SongId:    songId,
 			PlayCount: 1,
 		}
-		db.PGEngine.Table("recently_playeds").Create(&newRp)
+		db.PGEngine.Table("recent_lists").Create(&newRp)
 	} else {
 		newpc := rp.PlayCount + 1
-		db.PGEngine.Table("recently_playeds").Update("play_count", newpc)
+		db.PGEngine.Table("recent_lists").Where(&model.RecentList{
+			UserId: u.ID,
+			SongId: songId,
+		}).Update("play_count", newpc)
+		db.PGEngine.Table("favor_lists").Where(&model.FavorList{
+			UserId: u.ID,
+			SongId: songId,
+		}).Update("play_count", newpc)
 	}
 
 	var song model.Song
@@ -106,10 +106,11 @@ func Play(ctx *gin.Context)  {
 	}
 
 	//返回结果
-	response.Success(ctx, gin.H{"song":result}, "正在播放")
+	response.Success(ctx, gin.H{"song": result}, "正在播放")
 }
 
-func Favor(ctx *gin.Context)  {
+//收藏歌曲
+func Favor(ctx *gin.Context) {
 	//获取userInfo
 	user, _ := ctx.Get("user")
 	u := user.(model.User)
@@ -119,25 +120,36 @@ func Favor(ctx *gin.Context)  {
 	songId, _ := strconv.Atoi(id)
 
 	var fl model.FavorList
-	db_result1 := db.PGEngine.Table("favor_lists").Where("song_id = ?", songId).First(&fl)
+	db_result1 := db.PGEngine.Table("favor_lists").Where(&model.FavorList{UserId: u.ID, SongId: songId}).First(&fl)
 
 	//如果没有被收藏
 	if db_result1.RecordNotFound() {
 		//查询最近列表中是否存在
-		var rp model.RecentlyPlayed
-		db_result := db.PGEngine.Table("recently_playeds").Where("song_id = ?", songId).First(&rp)
+		var rp model.RecentList
+		db_result := db.PGEngine.Table("recent_lists").Where("song_id = ?", songId).First(&rp)
 
 		//若找不到
 		if db_result.RecordNotFound() {
 			var song model.Song
-			db.PGEngine.Where("id = ?", songId).First(&song)
-			newFavor := model.FavorList{
-				UserId:    u.ID,
-				SongName:  song.Name,
-				SongId:    songId,
-				PlayCount: 0,
+			song_result := db.PGEngine.Where("id = ?", songId).First(&song)
+
+			if song_result.RecordNotFound() {
+				response.Fail(ctx, nil, "系统暂无此歌曲")
+			} else {
+				newFavor := model.FavorList{
+					UserId:    u.ID,
+					SongName:  song.Name,
+					SongId:    songId,
+					PlayCount: 0,
+				}
+				db.PGEngine.Table("favor_lists").Create(&newFavor)
+				//喂推荐
+				fm := mygorse.ToFeedbackModel(newFavor)
+				mygorse.Feedback(fm)
+
+				//返回结果
+				response.Success(ctx, nil, "收藏成功")
 			}
-			db.PGEngine.Table("recently_playeds").Create(&newFavor)
 		} else {
 			newFavor := model.FavorList{
 				UserId:    u.ID,
@@ -146,16 +158,75 @@ func Favor(ctx *gin.Context)  {
 				PlayCount: rp.PlayCount,
 			}
 			db.PGEngine.Table("favor_lists").Create(&newFavor)
-		}
+			//喂推荐
+			fm := mygorse.ToFeedbackModel(newFavor)
+			mygorse.Feedback(fm)
 
-		//返回结果
-		response.Success(ctx, nil, "收藏成功")
-	} else {	//如果收藏了
+			//返回结果
+			response.Success(ctx, nil, "收藏成功")
+		}
+	} else { //如果收藏了
 		db.PGEngine.Table("favor_lists").Where("song_id = ?", songId).Delete(&fl)
 
 		//返回结果
 		response.Success(ctx, nil, "取消收藏成功")
 	}
+}
 
+//获取收藏列表
+func GetFavorList(ctx *gin.Context) {
+	//获取userInfo
+	user, _ := ctx.Get("user")
+	u := user.(model.User)
 
+	//根据用户ID查询收藏列表
+	var fl []model.FavorList
+	db.PGEngine.Table("favor_lists").Where("user_id = ?", u.ID).Find(&fl)
+
+	//返回结果
+	var results []Result
+	for key, _ := range fl {
+		song := new(model.Song)
+		db.PGEngine.Table("songs").Where("id = ?", fl[key].SongId).First(&song)
+		artist := new(model.Artist)
+		db.PGEngine.Table("artists").Where("id = ?", song.ArtistId).First(&artist)
+		playUrl := fmt.Sprintf("http://music.163.com/song/media/outer/url?id=%d", song.Id)
+		result := Result{
+			SongId:     song.Id,
+			SongName:   song.Name,
+			ArtistName: artist.Name,
+			PlayUrl:    playUrl,
+		}
+		results = append(results, result)
+	}
+	response.Success(ctx, gin.H{"list": results}, "收藏列表")
+}
+
+//获取最近播放列表
+func GetRecentList(ctx *gin.Context) {
+	//获取userInfo
+	user, _ := ctx.Get("user")
+	u := user.(model.User)
+
+	//根据用户ID查询收藏列表
+	var fl []model.FavorList
+	db.PGEngine.Table("recent_lists").Where("user_id = ?", u.ID).Find(&fl)
+
+	//返回结果
+	var results []Result
+	for key, _ := range fl {
+		song := new(model.Song)
+		db.PGEngine.Table("songs").Where("id = ?", fl[key].SongId).First(&song)
+		artist := new(model.Artist)
+		db.PGEngine.Table("artists").Where("id = ?", song.ArtistId).First(&artist)
+		playUrl := fmt.Sprintf("http://music.163.com/song/media/outer/url?id=%d", song.Id)
+		result := Result{
+			SongId:     song.Id,
+			SongName:   song.Name,
+			ArtistName: artist.Name,
+			PlayUrl:    playUrl,
+		}
+		results = append(results, result)
+	}
+	response.Success(ctx, gin.H{"list": results}, "最近播放列表")
 }
